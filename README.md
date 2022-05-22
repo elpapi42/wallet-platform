@@ -9,7 +9,8 @@ As the first two engineers of this startup, is our responsibility to build the f
 
 In short, we need a platform that gives priority to consistency and resiliency, over other things, like performance for example.
 
+Also, we need to take into consideration that the business is operating with very little money, so they are not going to hire more engineers in at least the following two years. As we are only two engineers, we must ensure our design takes into consideration that we are going to maintain and evolve this for a long time, so we need a platform that can be maintained by two guys without trouble. We should also deliver the first iteration of the platform in the minimum possible time, but business stakeholders are willing to be patient if that means we can meet the requirements described above.
+
 # Engineers Notes
 
 1.
-
