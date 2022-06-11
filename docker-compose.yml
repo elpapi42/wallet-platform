@@ -75,3 +75,65 @@ services:
       - kafka-02
       - kafka-03
     container_name: wallet-kafdrop
+
+  elastic-01:
+    image: elasticsearch:8.2.2
+    environment:
+      - node.name=elastic-01
+      - cluster.name=wallet-cluster
+      - discovery.seed_hosts=elastic-02,elastic-03
+      - cluster.initial_master_nodes=elastic-01,elastic-02,elastic-03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data/elastic-01:/usr/share/elasticsearch/data
+    container_name: wallet-elastic-01
+  
+  elastic-02:
+    image: elasticsearch:8.2.2
+    environment:
+      - node.name=elastic-02
+      - cluster.name=wallet-cluster
+      - discovery.seed_hosts=elastic-01,elastic-03
+      - cluster.initial_master_nodes=elastic-01,elastic-02,elastic-03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data/elastic-02:/usr/share/elasticsearch/data
+    container_name: wallet-elastic-02
+
+  elastic-03:
+    image: elasticsearch:8.2.2
+    environment:
+      - node.name=elastic-03
+      - cluster.name=wallet-cluster
+      - discovery.seed_hosts=elastic-01,elastic-02
+      - cluster.initial_master_nodes=elastic-01,elastic-02,elastic-03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data/elastic-03:/usr/share/elasticsearch/data
+    container_name: wallet-elastic-03
+
+  kibana:
+    image: kibana:8.2.2
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elastic-01:9200","http://elastic-02:9200","http://elastic-03:9200"]'
+    ports:
+      - 5601:5601
+    container_name: wallet-kibana
