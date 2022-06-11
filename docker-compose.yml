@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  kafka-01:
+    image: bitnami/kafka:3.2.0
+    environment:
+      KAFKA_ENABLE_KRAFT: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_LISTENERS: INTERNAL://kafka-01:9092,EXTERNAL://:9093,CONTROLLER://kafka-01:9091
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://kafka-01:9092,EXTERNAL://localhost:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka-01:9091,2@kafka-02:9091,3@kafka-03:9091
+      ALLOW_PLAINTEXT_LISTENER: 1
+      KAFKA_KRAFT_CLUSTER_ID: WSxyUqJ9TVmF93BCS21HMg
+      BITNAMI_DEBUG: 1
+    ports:
+      - 9093:9093
+    volumes:
+      - ./data/kafka-01:/bitnami/kafka
+    container_name: wallet-kafka-01
+
+  kafka-02:
+    image: bitnami/kafka:3.2.0
+    environment:
+      KAFKA_ENABLE_KRAFT: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_LISTENERS: INTERNAL://kafka-02:9092,EXTERNAL://:9094,CONTROLLER://kafka-02:9091
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://kafka-02:9092,EXTERNAL://localhost:9094
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_BROKER_ID: 2
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka-01:9091,2@kafka-02:9091,3@kafka-03:9091
+      ALLOW_PLAINTEXT_LISTENER: 1
+      KAFKA_KRAFT_CLUSTER_ID: WSxyUqJ9TVmF93BCS21HMg
+      BITNAMI_DEBUG: 1
+    ports:
+      - 9094:9094
+    volumes:
+      - ./data/kafka-02:/bitnami/kafka
+    container_name: wallet-kafka-02
+  
+  kafka-03:
+    image: bitnami/kafka:3.2.0
+    environment:
+      KAFKA_ENABLE_KRAFT: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_LISTENERS: INTERNAL://kafka-03:9092,EXTERNAL://:9095,CONTROLLER://kafka-03:9091
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://kafka-03:9092,EXTERNAL://localhost:9095
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_BROKER_ID: 3
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka-01:9091,2@kafka-02:9091,3@kafka-03:9091
+      ALLOW_PLAINTEXT_LISTENER: 1
+      KAFKA_KRAFT_CLUSTER_ID: WSxyUqJ9TVmF93BCS21HMg
+      BITNAMI_DEBUG: 1
+    ports:
+      - 9095:9095
+    volumes:
+      - ./data/kafka-03:/bitnami/kafka
+    container_name: wallet-kafka-03
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    environment:
+      KAFKA_BROKERCONNECT: kafka-01:9092,kafka-02:9092,kafka-03:9092
+    ports:
+      - 9000:9000
+    depends_on:
+      - kafka-01
+      - kafka-02
+      - kafka-03
+    container_name: wallet-kafdrop
