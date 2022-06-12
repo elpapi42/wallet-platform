@@ -14,3 +14,106 @@ Also, we need to take into consideration that the business is operating with ver
 # Engineers Notes
 
 1.
+
+# Domain Draft
+
+from typing import List
+from uuid import UUID
+from enum import Enum
+
+
+class User:
+    id: UUID
+    email: str
+    password: str
+    name: str
+
+
+class Currency(str, Enum):
+    USD = "USD"
+    EUR = "EUR"
+    BTC = "BTC"
+    COP = "COP"
+
+
+class Wallet:
+    id: UUID
+    user_id: UUID
+    currency: Currency
+    balance: float
+
+    def add_balance(self, amount: float):
+        balance = self.balance + amount
+    
+        if balance < 0.0:
+            raise ValueError('InsuficientFoundsError')
+
+        self.balance = balance
+
+
+class DepositSource:
+    PSE = "PSE"
+    BANK_TRANSFER = "BANK_TRANSFER"
+    ATM_DEPOSIT = "ATM_DEPOSIT"
+    CREDIT_CARD = "CREDIT_CARD"
+    BITCOIN_NETWORK = "BITCOIN_NETWORK"
+
+    def is_currency_supported(self, currency: Currency) -> bool:
+        mapping = {
+            DepositSource.PSE: [Currency.COP],
+            DepositSource.BANK_TRANSFER: [Currency.COP],
+            DepositSource.ATM_DEPOSIT: [Currency.COP],
+            DepositSource.CREDIT_CARD: [Currency.COP, Currency.USD, Currency.EUR],
+            DepositSource.BITCOIN_NETWORK: [Currency.BTC],
+        }
+
+        return currency in mapping[self]
+
+
+class Deposit:
+    id: UUID
+    user_id: UUID
+    source: DepositSource
+    wallet: Wallet
+    amount: float
+
+    def validate_wallet_support_source(self):
+        if not self.source.is_currency_supported(self.wallet.currency):
+            raise ValueError('DepositSourceError')
+
+
+class WithdrawalTarget:
+    BANK_TRANSFER = "BANK_TRANSFER"
+    ATM_WITHDRAWAL = "ATM_WITHDRAWAL"
+    BITCOIN_NETWORK = "BITCOIN_NETWORK"
+
+    def is_currency_supported(self, currency: Currency) -> bool:
+        mapping = {
+            WithdrawalTarget.BANK_TRANSFER: [Currency.COP],
+            WithdrawalTarget.ATM_WITHDRAWAL: [Currency.COP],
+            WithdrawalTarget.BITCOIN_NETWORK: [Currency.BTC],
+        }
+
+        return currency in mapping[self]
+
+class Withdrawal:
+    id: UUID
+    user_id: UUID
+    target: WithdrawalTarget
+    wallet: Wallet
+    amount: float
+
+    def validate_wallet_support_target(self):
+        if not self.target.is_currency_supported(self.wallet.currency):
+            raise ValueError('WithdrawalTargetError')
+
+
+class Transfer:
+    id: UUID
+    source_wallet: Wallet
+    target_wallet: Wallet
+    amount: float
+
+    def validate_wallets_support_transfer(self):
+        if not self.source_wallet.currency == self.target_wallet.currency:
+            raise ValueError('TransferError')

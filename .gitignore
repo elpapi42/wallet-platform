@@ -18,3 +18,4 @@ bin
 data
 .env
 tmp
+.vscode
