@@ -3,3 +3,9 @@ build:
 
 start:
 	bin/application
+
+dev:
+	air
+
+make test:
+	go test -v ./tests/
