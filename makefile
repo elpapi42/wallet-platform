@@ -1,5 +1,5 @@
 build:
-	go build -o bin/application source/infrastructure/main.go
+	go build -o bin/application source/main.go
 
 start:
 	bin/application
