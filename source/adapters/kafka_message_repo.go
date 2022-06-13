@@ -20,23 +20,23 @@ func (r *KafkaMessageRepository) Add(message domain.Message) error {
 		return error
 	}
 
-	start := time.Now()
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	err := r.Writer.WriteMessages(ctx, kafka.Message{
+	m := kafka.Message{
 		Key:   []byte(message.GetKey()),
 		Value: value,
 		Headers: []kafka.Header{
 			{Key: "name", Value: []byte(message.GetName())},
 		},
-	})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	err := r.Writer.WriteMessages(ctx, m)
 	if err != nil {
 		log.Println("failed to write message to kafka: ", err)
 		return err
 	}
 
-	log.Println("Wrote message to Kafka in", time.Since(start))
+	log.Println("message sent:", string(m.Key), string(m.Value))
 
 	return nil
 }

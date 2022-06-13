@@ -1,8 +1,8 @@
-package adapters
+package controllers
 
 import (
+	"wallet/source/adapters"
 	"wallet/source/application"
-
 	"wallet/source/infrastructure/kafka"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,7 @@ func CreateUserController(c *gin.Context) {
 		return
 	}
 
-	message_repo := &KafkaMessageRepository{kafka.Writer}
+	message_repo := &adapters.KafkaMessageRepository{Writer: kafka.Writer}
 
 	service := application.CreateUserService{MessageRepo: message_repo}
 

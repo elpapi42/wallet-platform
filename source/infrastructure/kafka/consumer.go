@@ -3,7 +3,6 @@ package kafka
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -54,7 +53,13 @@ func (k *KafkaConsumer) iterate() {
 		return
 	}
 
-	fmt.Println("message received:", string(m.Key), string(m.Value), string(m.Headers[0].Value))
+	log.Println("message received:", string(m.Key), string(m.Value))
+
+	handlers := getHandlersForMessage(m)
+
+	for _, handler := range handlers {
+		handler(m)
+	}
 
 	commitCtx, commitCancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer commitCancel()

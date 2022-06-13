@@ -1,11 +1,11 @@
 package gin
 
 import (
-	"wallet/source/adapters"
+	"wallet/source/adapters/controllers"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(engine *gin.Engine) {
-	engine.POST("/users", adapters.CreateUserController)
+	engine.POST("/users", controllers.CreateUserController)
 }
