@@ -20,6 +20,8 @@ services:
       - 9093:9093
     volumes:
       - ./data/kafka-01:/bitnami/kafka
+    networks:
+      - walletd
     container_name: wallet-kafka-01
 
   kafka-02:
@@ -41,6 +43,8 @@ services:
       - 9094:9094
     volumes:
       - ./data/kafka-02:/bitnami/kafka
+    networks:
+      - walletd
     container_name: wallet-kafka-02
   
   kafka-03:
@@ -62,6 +66,8 @@ services:
       - 9095:9095
     volumes:
       - ./data/kafka-03:/bitnami/kafka
+    networks:
+      - walletd
     container_name: wallet-kafka-03
 
   kafdrop:
@@ -74,6 +80,8 @@ services:
       - kafka-01
       - kafka-02
       - kafka-03
+    networks:
+      - walletd
     container_name: wallet-kafdrop
 
   elastic-01:
@@ -86,12 +94,16 @@ services:
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ports:
+      - 9200:9200
     ulimits:
       memlock:
         soft: -1
         hard: -1
     volumes:
       - ./data/elastic-01:/usr/share/elasticsearch/data
+    networks:
+      - walletd
     container_name: wallet-elastic-01
   
   elastic-02:
@@ -104,12 +116,16 @@ services:
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ports:
+      - 9201:9200
     ulimits:
       memlock:
         soft: -1
         hard: -1
     volumes:
       - ./data/elastic-02:/usr/share/elasticsearch/data
+    networks:
+      - walletd
     container_name: wallet-elastic-02
 
   elastic-03:
@@ -122,12 +138,16 @@ services:
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ports:
+      - 9202:9200
     ulimits:
       memlock:
         soft: -1
         hard: -1
     volumes:
       - ./data/elastic-03:/usr/share/elasticsearch/data
+    networks:
+      - walletd
     container_name: wallet-elastic-03
 
   kibana:
@@ -136,4 +156,95 @@ services:
       ELASTICSEARCH_HOSTS: '["http://elastic-01:9200","http://elastic-02:9200","http://elastic-03:9200"]'
     ports:
       - 5601:5601
+    networks:
+      - walletd
     container_name: wallet-kibana
+
+  eventstore-01:
+    image: eventstore/eventstore:21.10.0-buster-slim
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=3
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+      - EVENTSTORE_DISCOVER_VIA_DNS=false
+      - EVENTSTORE_ADVERTISE_HOST_TO_CLIENT_AS=127.0.0.1
+
+      - EVENTSTORE_INT_IP=172.30.240.11
+      - EVENTSTORE_ADVERTISE_HTTP_PORT_TO_CLIENT_AS=2111
+      - EVENTSTORE_ADVERTISE_TCP_PORT_TO_CLIENT_AS=1111
+      - EVENTSTORE_GOSSIP_SEED=172.30.240.12:2113,172.30.240.13:2113
+    ports:
+      - 1111:1113
+      - 2111:2113
+    volumes:
+      - ./data/eventstore-01/data:/var/lib/eventstore
+      - ./data/eventstore-01/logs:/var/log/eventstore
+    networks:
+      walletd:
+        ipv4_address: 172.30.240.11
+    container_name: wallet-eventstore-01
+
+  eventstore-02:
+    image: eventstore/eventstore:21.10.0-buster-slim
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=3
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+      - EVENTSTORE_DISCOVER_VIA_DNS=false
+      - EVENTSTORE_ADVERTISE_HOST_TO_CLIENT_AS=127.0.0.1
+
+      - EVENTSTORE_INT_IP=172.30.240.12
+      - EVENTSTORE_ADVERTISE_HTTP_PORT_TO_CLIENT_AS=2112
+      - EVENTSTORE_ADVERTISE_TCP_PORT_TO_CLIENT_AS=1112
+      - EVENTSTORE_GOSSIP_SEED=172.30.240.11:2113,172.30.240.13:2113
+    ports:
+      - 1112:1113
+      - 2112:2113
+    volumes:
+      - ./data/eventstore-02/data:/var/lib/eventstore
+      - ./data/eventstore-02/logs:/var/log/eventstore
+    networks:
+      walletd:
+        ipv4_address: 172.30.240.12
+    container_name: wallet-eventstore-02
+  
+  eventstore-03:
+    image: eventstore/eventstore:21.10.0-buster-slim
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=3
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+      - EVENTSTORE_DISCOVER_VIA_DNS=false
+      - EVENTSTORE_ADVERTISE_HOST_TO_CLIENT_AS=127.0.0.1
+
+      - EVENTSTORE_INT_IP=172.30.240.13
+      - EVENTSTORE_ADVERTISE_HTTP_PORT_TO_CLIENT_AS=2113
+      - EVENTSTORE_ADVERTISE_TCP_PORT_TO_CLIENT_AS=1113
+      - EVENTSTORE_GOSSIP_SEED=172.30.240.11:2113,172.30.240.12:2113
+    ports:
+      - 1113:1113
+      - 2113:2113
+    volumes:
+      - ./data/eventstore-03/data:/var/lib/eventstore
+      - ./data/eventstore-03/logs:/var/log/eventstore
+    networks:
+      walletd:
+        ipv4_address: 172.30.240.13
+    container_name: wallet-eventstore-03
+
+networks:
+  walletd:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.240.0/24
+    name: walletd
