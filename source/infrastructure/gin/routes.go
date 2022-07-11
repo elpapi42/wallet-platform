@@ -7,5 +7,6 @@ import (
 )
 
 func RegisterRoutes(engine *gin.Engine) {
-	engine.POST("/users", controllers.CreateUserController)
+	engine.POST("/wallets", controllers.CreateWalletController)
+	engine.POST("/deposits", controllers.MakeDepositController)
 }

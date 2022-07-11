@@ -11,7 +11,7 @@ var Writer *kafka.Writer
 func InitWriter() {
 	Writer = &kafka.Writer{
 		Addr:      kafka.TCP("localhost:9095"),
-		Topic:     "testing-01",
+		Topic:     "monolog",
 		Balancer:  &kafka.Hash{},
 		BatchSize: 1,
 	}

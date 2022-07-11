@@ -11,8 +11,8 @@ import (
 func main() {
 	consumer := kafka.NewKafkaConsumer(
 		[]string{"localhost:9095"},
-		"testing-01",
-		"consumers-02",
+		"monolog",
+		"monolog-consumer",
 	)
 	server := gin.NewGinServer(8080)
 

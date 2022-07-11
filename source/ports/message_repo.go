@@ -1,7 +1,7 @@
 package ports
 
-import "wallet/source/domain"
+import "wallet/source/domain/messages"
 
 type MessageRepository interface {
-	Add(domain.Message) error
+	Add([]messages.Message) error
 }

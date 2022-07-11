@@ -1,14 +1,12 @@
 package kafka
 
 import (
-	"wallet/source/adapters/handlers"
-
 	"github.com/segmentio/kafka-go"
 )
 
 func getHandlersForMessage(message kafka.Message) []func(kafka.Message) error {
 	handlerMap := map[string][]func(kafka.Message) error{
-		"CreateUser": {handlers.SaveUserHandler},
+		//"DepositReceived": {handlers.UpdateWalletBalanceByDepositHandler},
 	}
 
 	var messageName string

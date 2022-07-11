@@ -1,6 +1,6 @@
-package domain
+package messages
 
 type Message interface {
-	GetKey() string
 	GetName() string
+	GetKey() string
 }
